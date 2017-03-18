@@ -1,3 +1,4 @@
+
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
@@ -16,5 +17,11 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Inc16(in=PCout, out=INCout);
+
+    Mux16(a=PCout, b=INCout, sel=inc, out=step1);
+    Mux16(a=step1, b=in, sel=load, out=step2);
+    Mux16(a=step2, b=false, sel=reset, out=step3);
+
+    Register(in=step3, load=true, out=out, out=PCout);
 }

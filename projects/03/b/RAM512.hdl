@@ -1,12 +1,12 @@
-// This file is part of the materials accompanying the book 
-// "The Elements of Computing Systems" by Nisan and Schocken, 
+// This file is part of the materials accompanying the book
+// "The Elements of Computing Systems" by Nisan and Schocken,
 // MIT Press. Book site: www.idc.ac.il/tecs
 // File name: projects/03/b/RAM512.hdl
 
 /**
  * Memory of 512 registers, each 16 bit-wide. Out holds the value
- * stored at the memory location specified by address. If load==1, then 
- * the in value is loaded into the memory location specified by address 
+ * stored at the memory location specified by address. If load==1, then
+ * the in value is loaded into the memory location specified by address
  * (the loaded value will be emitted to out from the next time step onward).
  */
 
@@ -15,5 +15,14 @@ CHIP RAM512 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    DMux8Way(in=load, sel=address[6..8], a=La, b=Lb, c=Lc, d=Ld, e=Le, f=Lf, g=Lg, h=Lh);
+    RAM64(in=in, load=La, address=address[0..5], out=Ra);
+    RAM64(in=in, load=Lb, address=address[0..5], out=Rb);
+    RAM64(in=in, load=Lc, address=address[0..5], out=Rc);
+    RAM64(in=in, load=Ld, address=address[0..5], out=Rd);
+    RAM64(in=in, load=Le, address=address[0..5], out=Re);
+    RAM64(in=in, load=Lf, address=address[0..5], out=Rf);
+    RAM64(in=in, load=Lg, address=address[0..5], out=Rg);
+    RAM64(in=in, load=Lh, address=address[0..5], out=Rh);
+    Mux8Way16(a=Ra, b=Rb, c=Rc, d=Rd, e=Re, f=Rf, g=Rg, h=Rh, sel=address[6..8], out=out);
 }
