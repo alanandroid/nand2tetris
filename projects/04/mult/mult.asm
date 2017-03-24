@@ -22,31 +22,27 @@
   // make a counter, set it equal to 0
   @counter
   M=0
-  // make a product variable, set it equal to R0
-  @R0
-  D=M
-  @product
-  M=D
 
 // loop addition to produce multiplication
 (LOOP)
-  // add R0 to product
+  // check loop condition (counter <= R1)
+  @counter
+  D=M
+  @R1
+  D=M-D
+  @END
+  D;JLE
+  // add R0 to R2, where we're storing our product.
   @R0
   D=M
-  @product
+  @R2
   M=D+M
   // increment counter
   @counter
   M=M+1
-  // check loop condition (counter <= R1)
-  D=M
-  @R1
-  D=D-M
-  @END
-  D;JLT
+  // restart the loop
   @LOOP
   0;JMP
-
 (END)
   @END
   0;JMP
