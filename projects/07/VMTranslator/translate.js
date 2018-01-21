@@ -1,3 +1,11 @@
+class CompilationError extends Error {
+  constructor(line) {
+    super('ERROR: Compilation error'
+      + 'unable to parse line "' + line + '"');
+    this.name = "CompilationError";
+  }
+}
+
 /**
 * File Overview:
 *
@@ -51,14 +59,14 @@ if (process.argv.length < 3) {
     // create, or clear content in the output file.
     fs.writeFileSync(output, '');
 
-    fs.readFileSync(input).toString().split('\n').forEach(function (line, index) {
-      fs.appendFileSync(output, translateLine(line, index + 1));
+    fs.readFileSync(input).toString().split('\n').forEach(function (line) {
+      fs.appendFileSync(output, translateLine(line));
     });
   }
 }
 
-function translateLine(line, lineNumber) {
-  line = line.toString().toUpperCase();
+function translateLine(line) {
+  line = line.toString();
   line = removeExtraWhiteSpaceFrom(line);
   // if the string is empty, return an empty line
   if(!line) return '';
@@ -67,7 +75,7 @@ function translateLine(line, lineNumber) {
 
   let translatedLine;
 
-  switch(words[0]) {
+  switch(words[0].toUpperCase()) {
     case 'POP':
       translatedLine = translatePOP(words);
       break;
@@ -102,13 +110,12 @@ function translateLine(line, lineNumber) {
       translatedLine = translateNOT(words);
       break;
     default:
-      throw Error ('ERROR: Compilation error at line ' + lineNumber + '\n'
-        + 'unable to parse line \n'
-        + '"' + line + '"';
-      process.exit(-1);
+      throw new CompilationError(line);
   }
 
-  const completeStatement = '// ' + line.toString() + '\n';
+  const completeStatement =
+      '// ' + line + '\n' +
+      translatedLine + '\n';
 
   return completeStatement;
 }
@@ -118,6 +125,9 @@ function translatePOP(words) {
 }
 
 function translatePUSH(words) {
+  if (words.length < 2) {
+    throw new CompilationError("hi", 1)
+  }
   return 'PUSH';
 }
 
@@ -161,6 +171,7 @@ function removeExtraWhiteSpaceFrom(string) {
   return string.replace(/\s+/g, ' ').trim();
 }
 
+
 /*
 add, sub, neg, eq, gt, lt, and, or not
 pop segment i, push segment i
@@ -173,3 +184,4 @@ segments:
   static
   pointer
   temp
+*/
