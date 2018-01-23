@@ -1,3 +1,4 @@
-Hi Mom
-Hola Madre
-Konnichiwa Mama
+push constant 1
+pop local 3
+add
+eq
