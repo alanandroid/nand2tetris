@@ -1,63 +1,26 @@
 /**
- * File Overview:
- *
- */
+* File Overview:
+*
+*/
 const { CompilationError } = require('./errors');
+const { generateGeneralPOP, parseMemorySegment } = require('./utilFunctions');
 
 function translatePOP(words) {
-  const memorySegment = words[1];
+  const memorySegment = parseMemorySegment(words[1]);
   const memoryAddress = parseInt(words[2]);
 
   console.log('memory segment', memorySegment);
   console.log('memory address', memoryAddress);
 
-  switch (memorySegment.toUpperCase()) {
+  switch (memorySegment) {
 
-    case 'LOCAL':
-      return '' +
-      // ------------------------
-      // addr = LCL+memoryAddress
-      // ------------------------
-      // look at the memory address in order to get it's value into memory
-      '@' + memoryAddress + '\n' +
-      // store that value in the data register
-      'D=A' + '\n' +
-      // look at LCL in memory
-      '@LCL' + '\n' +
-      // add LCL to the memory address
-      'D=D+A' + '\n' +
-      // create a new variable
-      '@addr'
-      // store LCL+memoryAddress in it
-      'M=D'
-      // -----
-      // SP--;
-      // -----
-      '@SP' + '\n' +
-      'M=M-1' + '\n' +
-      // ----------
-      //*addr = *SP
-      // ----------
-      // @SP should be here, but we're already looking at it
-      // *SP - point at the memory address stored in @SP
-      'A=M' + '\n' +
-      // store whatever is there in the data register
-      'D=M' + '\n' +
-      // point at our variable created above, which contains LCL+memoryAddress
-      '@addr' + '\n' +
-      // point the address register at LCL+memoryAddress
-      'A=M' + '\n' +
-      // and put the contents of the data register (the contents of *SP) there
-      'M=D' + '\n';
-
-    case 'ARGUMENT':
-      return 'ARG';
-
+    case 'LCL':
+    case 'ARG':
     case 'THIS':
-      return 'THIS';
-
     case 'THAT':
-      return 'THAT';
+    case 'TEMP':
+      console.log(memorySegment);
+      return generateGeneralPOP(memorySegment, memoryAddress);
 
     case 'STATIC':
       return 'STATIC';
@@ -74,9 +37,6 @@ function translatePOP(words) {
       }
       return 'SP--' + '\n' + thisOrThat + ' = *SP';
 
-    case 'TEMP':
-      return 'TEMP';
-
     default:
       return '';
   }
@@ -85,3 +45,40 @@ function translatePOP(words) {
 module.exports = {
   translatePOP
 }
+
+
+/**
+
+Static handling:
+
+store each static in foo.i, where foo is the name of file
+i.e. push static 10 in translate.js -> add translate.10 onto the stack
+
+pop static 5
+->
+SP--
+D=*SP
+@translate.5
+M=D
+
+
+Temp handling:
+
+TEMP = 5, same as LOCAL
+
+
+Pointer handling:
+
+pop pointer 0
+->
+accesses THIS
+
+pop pointer 1
+->
+accesses THAT
+
+SP--
+THIS/THAT = *SP
+
+
+*/

@@ -1,3 +1,7 @@
+/**
+* File Overview:
+*
+*/
 function translateADD(words) {
   return 'ADD';
 }

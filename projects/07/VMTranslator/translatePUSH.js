@@ -1,74 +1,25 @@
 /**
- * File Overview:
- *
- */
+* File Overview:
+*
+*/
 const { CompilationError } = require('./errors');
+const { generateConstantPUSH, generateGeneralPUSH, parseMemorySegment } = require('./utilFunctions');
 
 function translatePUSH(words) {
-  const memorySegment = words[1];
+  const memorySegment = parseMemorySegment(words[1]);
   const memoryAddress = parseInt(words[2]);
 
   switch (memorySegment) {
 
-    case 'CONSTANT':
-    //TODO finish
-      return `@${memoryAddress}
-      D=A
-      @SP
-      ...`
-      return '' +
-      // ------------------------
-      // *SP = memoryAddress
-      // ------------------------
-      // look at the memory address in order to get it's value into memory
-      '@' + memoryAddress + '\n' +
-      // store that value in the data register
-      'D=A' + '\n' +
-      // point at *SP
-      '@SP' + '\n' +
-      'A=M' + '\n' +
-      // and put the contents of the data register (memoryAddress, or our constant) there
-      'M=D' + '\n' +
-      // -----
-      // SP++;
-      // -----
-      '@SP' + '\n' +
-      'M=M+1' + '\n';
-
     case 'LOCAL':
-      return '' +
-      // ------------------------
-      // *SP = *addr
-      // ------------------------
-      // look at the memory address in order to get it's value into memory
-      '@' + memoryAddress + '\n' +
-      // store that value in the data register
-      'D=A' + '\n' +
-      // look at LCL in memory
-      '@LCL' + '\n' +
-      // point the address register at LCL+memoryAddress
-      'A=D+A' + '\n' +
-      // store whatever is there in the data register
-      'D=M' + '\n' +
-      // point at *SP
-      '@SP' + '\n' +
-      'A=M' + '\n' +
-      // and put the contents of the data register (the contents of *addr) there
-      'M=D' + '\n' +
-      // -----
-      // SP++;
-      // -----
-      '@SP' + '\n' +
-      'M=M+1' + '\n';
-
     case 'ARGUMENT':
-      return 'ARG';
-
     case 'THIS':
-      return 'THIS';
-
     case 'THAT':
-      return 'THAT';
+    case 'TEMP':
+      return generateGeneralPUSH(memorySegment, memoryAddress);
+
+    case 'CONSTANT':
+      return generateConstantPUSH(memoryAddress);
 
     case 'STATIC':
       return 'STATIC';
@@ -85,16 +36,45 @@ function translatePUSH(words) {
       }
       return '*SP = ' + thisOrThat + '\n' + 'SP++';
 
-    case 'TEMP':
-      return 'TEMP';
-
     default:
       return '';
   }
-
-  return 'PUSH';
 }
 
 module.exports = {
   translatePUSH
-}
+};
+
+/**
+
+Static handling:
+
+store each static in foo.i, where foo is the name of file
+i.e. push static 10 in translate.js -> add translate.10 onto the stack
+
+push static 5
+->
+*SP = *translate.5
+SP++
+
+
+Temp handling:
+
+insert TEMP = 5, same as LOCAL
+no TMP symbol
+
+
+Pointer handling:
+
+push pointer 0
+->
+accesses THIS
+
+push pointer 1
+->
+accesses THAT
+
+*SP = THIS/THAT
+SP++
+
+*/
