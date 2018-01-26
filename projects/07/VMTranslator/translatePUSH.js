@@ -3,13 +3,13 @@
 *
 */
 const { CompilationError } = require('./errors');
-const { generateConstantPUSH, generateGeneralPUSH, parseMemorySegment } = require('./utilFunctions');
+const { generateGeneralPUSH, generateConstantPUSH, generatePointerPUSH, generateStaticPUSH } = require('./pushFunctions');
 
 function translatePUSH(words) {
-  const memorySegment = parseMemorySegment(words[1]);
+  const memorySegment = words[1];
   const memoryAddress = parseInt(words[2]);
 
-  switch (memorySegment) {
+  switch (memorySegment.toUpperCase()) {
 
     case 'LOCAL':
     case 'ARGUMENT':
@@ -22,19 +22,10 @@ function translatePUSH(words) {
       return generateConstantPUSH(memoryAddress);
 
     case 'STATIC':
-      return 'STATIC';
+      return generateStaticPUSH(memoryAddress);
 
     case 'POINTER':
-      let thisOrThat;
-      if (memoryAddress === 0) {
-        thisOrThat = 'THIS';
-      } else if (memoryAddress === 1) {
-        thisOrThat = 'THAT';
-      } else {
-        // TODO make this less bad
-        throw new Error('A nondesript error occurred.');
-      }
-      return '*SP = ' + thisOrThat + '\n' + 'SP++';
+      return generatePointerPUSH(memoryAddress);
 
     default:
       return '';

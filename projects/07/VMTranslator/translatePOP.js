@@ -3,39 +3,26 @@
 *
 */
 const { CompilationError } = require('./errors');
-const { generateGeneralPOP, parseMemorySegment } = require('./utilFunctions');
+const { generateGeneralPOP, generateStaticPOP, generatePointerPOP } = require('./popFunctions');
 
 function translatePOP(words) {
-  const memorySegment = parseMemorySegment(words[1]);
+  const memorySegment = words[1];
   const memoryAddress = parseInt(words[2]);
 
-  console.log('memory segment', memorySegment);
-  console.log('memory address', memoryAddress);
+  switch (memorySegment.toUpperCase()) {
 
-  switch (memorySegment) {
-
-    case 'LCL':
-    case 'ARG':
+    case 'LOCAL':
+    case 'ARGUMENT':
     case 'THIS':
     case 'THAT':
     case 'TEMP':
-      console.log(memorySegment);
       return generateGeneralPOP(memorySegment, memoryAddress);
 
     case 'STATIC':
-      return 'STATIC';
+      return generateStaticPOP(memoryAddress);
 
     case 'POINTER':
-      let thisOrThat;
-      if (memoryAddress === 0) {
-        thisOrThat = 'THIS';
-      } else if (memoryAddress === 1) {
-        thisOrThat = 'THAT';
-      } else {
-        // TODO make this less bad
-        throw new Error('A nondesript error occurred.');
-      }
-      return 'SP--' + '\n' + thisOrThat + ' = *SP';
+      return generatePointerPOP(memoryAddress);
 
     default:
       return '';
