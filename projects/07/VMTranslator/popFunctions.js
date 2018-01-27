@@ -49,6 +49,7 @@ function generateGeneralPOP(memorySegment, memoryAddress) {
 @${memoryAddress}
 D=A
 @${memorySegment}
+A=M
 D=D+A
 @addr
 M=D

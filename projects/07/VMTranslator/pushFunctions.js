@@ -39,6 +39,7 @@ function generateGeneralPUSH(memorySegment, memoryAddress) {
 @${memoryAddress}
 D=A
 @${memorySegment}
+A=M
 A=D+A
 D=M
 @SP

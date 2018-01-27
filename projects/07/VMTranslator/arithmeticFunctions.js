@@ -12,12 +12,10 @@ function translateADD() {
    */
   return `
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=D+M
 M=D
 @SP
@@ -35,13 +33,53 @@ function translateSUB() {
    */
   return `
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M-D
+M=D
+@SP
+M=M+1
+`;
+}
+
+function translateAND() {
+  /*
+   * SP--
+   * D=*SP
+   * SP--
+   * D=D&*SP
+   * *SP=D
+   */
+  return `
+@SP
+AM=M-1
+D=M
+@SP
+AM=M-1
+D=D&M
+M=D
+@SP
+M=M+1
+`;
+}
+
+function translateOR() {
+  /*
+   * SP--
+   * D=*SP
+   * SP--
+   * D=D||*SP
+   * *SP=D
+   */
+  return `
+@SP
+AM=M-1
+D=M
+@SP
+AM=M-1
+D=D||M
 M=D
 @SP
 M=M+1
@@ -56,9 +94,23 @@ function translateNEG() {
    */
   return `
 @SP
-M=M-1
-A=M
+AM=M-1
 M=-M
+@SP
+M=M+1
+`;
+}
+
+function translateNOT() {
+  /*
+   * SP--
+   * *SP=!*SP
+   * SP++
+   */
+  return `
+@SP
+AM=M-1
+M=!M
 @SP
 M=M+1
 `;
@@ -80,23 +132,21 @@ function translateEQ() {
    */
   return `
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 
 @SP
-M=M-1
-A=M
+AM=M-1
 D=D-M
 
 @SP
 A=M
-M=0
+M=-1
 @${jumpAddress}
-D;JNE
+D;JEQ
 @SP
 A=M
-M=-1
+M=-0
 (${jumpAddress})
 @SP
 M=M+1
@@ -104,77 +154,76 @@ M=M+1
 }
 
 function translateGT() {
+  let jumpAddress = getUniqueAddressSymbol();
   /*
    * SP--
    * D=*SP
+   * SP--
+   * D=D-*SP
+   * *SP=0
+   * @arith.{id}
+   * D;JGT
+   * *SP=1
+   * (arith.{id})
    *
    */
   return `
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 
+@SP
+AM=M-1
+D=D-M
+
+@SP
+A=M
+M=-1
+@${jumpAddress}
+D;JGT
+@SP
+A=M
+M=0
+(${jumpAddress})
+@SP
+M=M+1
 `;
 }
 
 function translateLT() {
+  let jumpAddress = getUniqueAddressSymbol();
   /*
    * SP--
    * D=*SP
+   * SP--
+   * D=D-*SP
+   * *SP=0
+   * @arith.{id}
+   * D;JLT
+   * *SP=1
+   * (arith.{id})
    *
    */
   return `
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 
-`;
-}
-
-function translateAND() {
-  /*
-   * SP--
-   * D=*SP
-   *
-   */
-  return `
 @SP
-M=M-1
-A=M
-D=M
+AM=M-1
+D=D-M
 
-`;
-}
-
-function translateOR() {
-  /*
-   * SP--
-   * D=*SP
-   *
-   */
-  return `
 @SP
-M=M-1
 A=M
-D=M
-
-`;
-}
-
-function translateNOT() {
-  /*
-   * SP--
-   * D=*SP
-   *
-   */
-  return `
+M=-1
+@${jumpAddress}
+D;JLT
 @SP
-M=M-1
 A=M
-D=M
-
+M=0
+(${jumpAddress})
+@SP
+M=M+1
 `;
 }
 
@@ -188,11 +237,11 @@ function getUniqueAddressSymbol () {
 module.exports = {
   translateADD,
   translateSUB,
-  translateNEG,
-  translateEQ,
-  translateGT,
-  translateLT,
   translateAND,
   translateOR,
-  translateNOT
+  translateNEG,
+  translateNOT,
+  translateEQ,
+  translateGT,
+  translateLT
 };

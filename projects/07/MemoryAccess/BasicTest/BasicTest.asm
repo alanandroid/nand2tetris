@@ -11,6 +11,7 @@ M=M+1
 @0
 D=A
 @LCL
+A=M
 D=D+A
 @addr
 M=D
@@ -44,6 +45,7 @@ M=M+1
 @2
 D=A
 @ARG
+A=M
 D=D+A
 @addr
 M=D
@@ -59,6 +61,7 @@ M=D
 @1
 D=A
 @ARG
+A=M
 D=D+A
 @addr
 M=D
@@ -83,6 +86,7 @@ M=M+1
 @6
 D=A
 @THIS
+A=M
 D=D+A
 @addr
 M=D
@@ -116,6 +120,7 @@ M=M+1
 @5
 D=A
 @THAT
+A=M
 D=D+A
 @addr
 M=D
@@ -131,6 +136,7 @@ M=D
 @2
 D=A
 @THAT
+A=M
 D=D+A
 @addr
 M=D
@@ -155,6 +161,7 @@ M=M+1
 @6
 D=A
 @5
+A=M
 D=D+A
 @addr
 M=D
@@ -170,6 +177,7 @@ M=D
 @0
 D=A
 @LCL
+A=M
 A=D+A
 D=M
 @SP
@@ -182,6 +190,7 @@ M=M+1
 @5
 D=A
 @THAT
+A=M
 A=D+A
 D=M
 @SP
@@ -192,12 +201,10 @@ M=M+1
 
 // add
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=D+M
 M=D
 @SP
@@ -207,6 +214,7 @@ M=M+1
 @1
 D=A
 @ARG
+A=M
 A=D+A
 D=M
 @SP
@@ -217,12 +225,10 @@ M=M+1
 
 // sub
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M-D
 M=D
 @SP
@@ -232,6 +238,7 @@ M=M+1
 @6
 D=A
 @THIS
+A=M
 A=D+A
 D=M
 @SP
@@ -244,6 +251,7 @@ M=M+1
 @6
 D=A
 @THIS
+A=M
 A=D+A
 D=M
 @SP
@@ -254,12 +262,10 @@ M=M+1
 
 // add
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=D+M
 M=D
 @SP
@@ -267,12 +273,10 @@ M=M+1
 
 // sub
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M-D
 M=D
 @SP
@@ -282,6 +286,7 @@ M=M+1
 @6
 D=A
 @5
+A=M
 A=D+A
 D=M
 @SP
@@ -292,12 +297,10 @@ M=M+1
 
 // add
 @SP
-M=M-1
-A=M
+AM=M-1
 D=M
 @SP
-M=M-1
-A=M
+AM=M-1
 D=D+M
 M=D
 @SP
