@@ -64,7 +64,6 @@ M=M+1
 `;
 }
 
-<<<<<<< HEAD
 function translateAND() {
   /*
    * SP--
@@ -107,16 +106,6 @@ M=M+1
 `;
 }
 
-=======
-/**
- * This function translates the VM instruction NEG into the appropriate HACK
- * assembly instructions:
- *
- * SP--
- * *SP=-*SP
- * SP++
- */
->>>>>>> 39779839581658279f8bcd25e850774724ddba60
 function translateNEG() {
   return `
 @SP
