@@ -161,7 +161,6 @@ M=M+1
 @6
 D=A
 @5
-A=M
 D=D+A
 @addr
 M=D
@@ -286,7 +285,6 @@ M=M+1
 @6
 D=A
 @5
-A=M
 A=D+A
 D=M
 @SP

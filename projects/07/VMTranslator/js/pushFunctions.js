@@ -15,10 +15,10 @@
  * {address}. For example, if the value at the top of your stack is 5, *SP is
  * equal to the value found in RAM[5].
  */
-const { getFileName, parseMemorySegment, parseTHISorTHAT } = require('./utilFunctions');
+const { getFileName, getMemoryPointer, parseTHISorTHAT } = require('./utilFunctions');
 
 function generateGeneralPUSH(memorySegment, memoryAddress) {
-  memorySegment = parseMemorySegment(memorySegment);
+  memorySegment = getMemoryPointer(memorySegment);
 
   /* Explanation of the below:
   *
@@ -51,8 +51,7 @@ function generateGeneralPUSH(memorySegment, memoryAddress) {
   return `
 @${memoryAddress}
 D=A
-@${memorySegment}
-A=M
+${memorySegment}
 A=D+A
 D=M
 @SP
@@ -102,7 +101,7 @@ M=M+1
 function generateStaticPUSH(memoryAddress) {
   const fileName = getFileName();
   /*
-   * *SP = *translate.5
+   * *SP = translate.5
    * SP++
    */
  return `
@@ -111,6 +110,7 @@ D=M
 @SP
 A=M
 M=D
+@SP
 M=M+1
 `;
 }

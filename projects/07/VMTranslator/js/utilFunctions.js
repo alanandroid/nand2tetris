@@ -13,21 +13,25 @@ function getFileName() {
   return path.parse(process.argv[2]).name;
 }
 
-function parseMemorySegment (memorySegment) {
+function getMemoryPointer(memorySegment) {
 
   switch (memorySegment.toUpperCase()) {
     case 'CONSTANT':
       return 'CONSTANT';
     case 'LOCAL':
-      return 'LCL';
+      return '@LCL' + '\n'
+        + 'A=M';
     case 'ARGUMENT':
-      return 'ARG';
+      return '@ARG' + '\n'
+        + 'A=M';
     case 'THIS':
-      return 'THIS';
+      return '@THIS' + '\n'
+        + 'A=M';
     case 'THAT':
-      return 'THAT';
+      return '@THAT' + '\n'
+        + 'A=M';
     case 'TEMP':
-      return '5';
+      return '@5';
     case 'STATIC':
       return 'STATIC';
     case 'POINTER':
@@ -50,6 +54,6 @@ function parseTHISorTHAT (memoryAddress) {
 
 module.exports = {
   getFileName,
-  parseMemorySegment,
+  getMemoryPointer,
   parseTHISorTHAT
 };

@@ -1,5 +1,0 @@
-push constant 1
-push constant 3
-add
-push constant 4
-eq

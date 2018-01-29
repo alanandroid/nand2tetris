@@ -16,6 +16,19 @@
  * equal to the value found in RAM[5].
  */
 
+function translateNEG() {
+ return unaryOperatorTemplate('-');
+}
+
+function translateNOT() {
+ /*
+ * SP--
+ * *SP=!*SP
+ * SP++
+ */
+ return unaryOperatorTemplate('!');
+}
+
 /**
  * This function translates the VM instruction ADD into the appropriate HACK
  * assembly instructions:
@@ -27,17 +40,7 @@
  * *SP=D
  */
 function translateADD() {
-  return `
-@SP
-AM=M-1
-D=M
-@SP
-AM=M-1
-D=D+M
-M=D
-@SP
-M=M+1
-`;
+  return binaryOperatorTemplate('+');
 }
 
 /**
@@ -51,41 +54,15 @@ M=M+1
  * *SP=D
  */
 function translateSUB() {
-  return `
-@SP
-AM=M-1
-D=M
-@SP
-AM=M-1
-D=M-D
-M=D
-@SP
-M=M+1
-`;
+  return binaryOperatorTemplate('-');
 }
 
 function translateAND() {
-  /*
-   * SP--
-   * D=*SP
-   * SP--
-   * D=D&*SP
-   * *SP=D
-   */
-  return `
-@SP
-AM=M-1
-D=M
-@SP
-AM=M-1
-D=D&M
-M=D
-@SP
-M=M+1
-`;
+  return binaryOperatorTemplate('&');
 }
 
 function translateOR() {
+  return binaryOperatorTemplate('|');
   /*
    * SP--
    * D=*SP
@@ -93,46 +70,9 @@ function translateOR() {
    * D=D||*SP
    * *SP=D
    */
-  return `
-@SP
-AM=M-1
-D=M
-@SP
-AM=M-1
-D=D||M
-M=D
-@SP
-M=M+1
-`;
-}
-
-function translateNEG() {
-  return `
-@SP
-AM=M-1
-M=-M
-@SP
-M=M+1
-`;
-}
-
-function translateNOT() {
-  /*
-   * SP--
-   * *SP=!*SP
-   * SP++
-   */
-  return `
-@SP
-AM=M-1
-M=!M
-@SP
-M=M+1
-`;
 }
 
 function translateEQ() {
-  let jumpAddress = getUniqueAddressSymbol();
   /*
    * SP--
    * D=*SP
@@ -145,31 +85,10 @@ function translateEQ() {
    * (arith.{id})
    *
    */
-  return `
-@SP
-AM=M-1
-D=M
-
-@SP
-AM=M-1
-D=D-M
-
-@SP
-A=M
-M=-1
-@${jumpAddress}
-D;JEQ
-@SP
-A=M
-M=-0
-(${jumpAddress})
-@SP
-M=M+1
-`;
+   return booleanOperatorTemplate('eq');
 }
 
 function translateGT() {
-  let jumpAddress = getUniqueAddressSymbol();
   /*
    * SP--
    * D=*SP
@@ -182,31 +101,10 @@ function translateGT() {
    * (arith.{id})
    *
    */
-  return `
-@SP
-AM=M-1
-D=M
-
-@SP
-AM=M-1
-D=D-M
-
-@SP
-A=M
-M=-1
-@${jumpAddress}
-D;JGT
-@SP
-A=M
-M=0
-(${jumpAddress})
-@SP
-M=M+1
-`;
+   return booleanOperatorTemplate('gt');
 }
 
 function translateLT() {
-  let jumpAddress = getUniqueAddressSymbol();
   /*
    * SP--
    * D=*SP
@@ -219,20 +117,64 @@ function translateLT() {
    * (arith.{id})
    *
    */
+   return booleanOperatorTemplate('lt');
+}
+
+function unaryOperatorTemplate(operator) {
+  return `
+@SP
+AM=M-1
+M=${operator}M
+@SP
+M=M+1
+`;
+}
+
+function binaryOperatorTemplate(operator) {
   return `
 @SP
 AM=M-1
 D=M
+@SP
+AM=M-1
+D=M${operator}D
+M=D
+@SP
+M=M+1
+`;
+}
 
+function booleanOperatorTemplate(operator) {
+  let jumpAddress = getUniqueAddressSymbol();
+
+  let jumpInstruction;
+
+  switch (operator) {
+    case 'lt':
+      jumpInstruction = 'D;JGT'
+      break;
+    case 'gt':
+      jumpInstruction = 'D;JLT'
+      break;
+    case 'eq':
+      jumpInstruction = 'D;JEQ'
+      break;
+    default:
+      throw new Error('That\'s not what that is for.');
+  }
+
+  return `
+@SP
+AM=M-1
+D=M
 @SP
 AM=M-1
 D=D-M
-
 @SP
 A=M
 M=-1
 @${jumpAddress}
-D;JLT
+${jumpInstruction}
 @SP
 A=M
 M=0

@@ -15,10 +15,10 @@
  * {address}. For example, if the value at the top of your stack is 5, *SP is
  * equal to the value found in RAM[5].
  */
-const { getFileName, parseMemorySegment, parseTHISorTHAT } = require('./utilFunctions');
+const { getFileName, getMemoryPointer, parseTHISorTHAT } = require('./utilFunctions');
 
 function generateGeneralPOP(memorySegment, memoryAddress) {
-  memorySegment = parseMemorySegment(memorySegment);
+  memorySegment = getMemoryPointer(memorySegment);
 
   /* Explanation of the below:
   *
@@ -61,8 +61,7 @@ function generateGeneralPOP(memorySegment, memoryAddress) {
   return `
 @${memoryAddress}
 D=A
-@${memorySegment}
-A=M
+${memorySegment}
 D=D+A
 @addr
 M=D

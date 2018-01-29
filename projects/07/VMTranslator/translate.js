@@ -10,8 +10,8 @@
 const fs  = require('fs');
 const path = require('path');
 
-const { CommandLineError, FileReadError } = require('./errors');
-const { translateLine } = require('./translateLine');
+const { CommandLineError, FileReadError } = require('./js/errors');
+const { translateLine } = require('./js/translateLine');
 
 let stack = [];
 
@@ -48,7 +48,11 @@ if (process.argv.length < 3) {
     fs.writeFileSync(output, '');
 
     fs.readFileSync(input).toString().split('\n').forEach(function (line, lineNumber) {
-      fs.appendFileSync(output, translateLine(line, lineNumber + 1));
+      if(line.startsWith("//")) {
+        return;
+      } else {
+        fs.appendFileSync(output, translateLine(line, lineNumber + 1));
+      }
     });
   }
 }
