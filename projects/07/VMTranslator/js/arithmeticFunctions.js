@@ -15,17 +15,19 @@
  * {address}. For example, if the value at the top of your stack is 5, *SP is
  * equal to the value found in RAM[5].
  */
+const { getUniqueSymbol } = require('./utilFunctions');
 
+/* Translates the VM operation 'NEG', which pops the value at the top of the
+ * stack, computes its negative, and pushes it back on top of the stack.
+ */
 function translateNEG() {
  return unaryOperatorTemplate('-');
 }
 
-function translateNOT() {
- /*
- * SP--
- * *SP=!*SP
- * SP++
+/* Translates the VM operation 'NOT', which pops the value at the top of the
+ * stack, computes its bitwise inverse, and pushes it back on top of the stack.
  */
+function translateNOT() {
  return unaryOperatorTemplate('!');
 }
 
@@ -120,6 +122,13 @@ function translateLT() {
    return booleanOperatorTemplate('lt');
 }
 
+/* This function provides a template for our unary operators (-x, !x). The process
+ * flow is as follows:
+ *
+ * SP--                       decrement the stack pointer
+ * *SP = <OPERATOR> *SP       operate on the top element
+ * SP++                       increment the stack pointer
+ */
 function unaryOperatorTemplate(operator) {
   return `
 @SP
@@ -130,6 +139,18 @@ M=M+1
 `;
 }
 
+/* This function provides a template for our binary, non-boolean operators (x+y,
+ * x-y, x&y, x|y). The process flow is as follows:
+ *
+ * SP--                       decrement the stack pointer
+ * D = *SP                    assign the value from the top of the stack to the
+ *                              data register
+ * SP--                       decrement the stack pointer
+ * D = *SP <OPERATOR> D       compute the value from the top of the stack
+ *                              operated on by the value in the data register
+ * *SP = D                    push the calculated value on top of the stack
+ * SP++                       increment the stack pointer
+ */
 function binaryOperatorTemplate(operator) {
   return `
 @SP
@@ -144,17 +165,40 @@ M=M+1
 `;
 }
 
+/* This function provides a template for our boolean operators ('LT', 'GT',
+ * 'EQ'). The process flow is as follows:
+ *
+ * SP--                       decrement the stack pointer
+ * D = *SP                    assign the value from the top of the stack to the
+ *                              data register
+ * SP--                       decrement the stack pointer
+ * D = D - *SP                compute the value in the data register minus
+ *                              the value from the top of the stack. the HACK
+ *                              assembly jumps on the conditions compared to
+ *                              zero, so we start by taking the difference of
+ *                              the values.
+ * *SP = 0                    push 0 (false) on top of the stack
+ * @arith.{id}                point to the (uniquely generated) symbol below
+ * <JUMP INSTRUCTION>         conditionally, jump to that symbol
+ * *SP = 1                    push -1 (true) on top of the stack
+ * (arith.{id})               the symbol we may have jumped to earlier
+ * SP++                       increment the stack pointer
+*/
 function booleanOperatorTemplate(operator) {
-  let jumpAddress = getUniqueAddressSymbol();
+  // generate a unique symbol to use as a jump address
+  let jumpAddress = getUniqueSymbol();
 
+  // generate the instruction for our conditional jump
   let jumpInstruction;
 
+  /* straight forward translation from local operation to jump instruction.
+   */
   switch (operator) {
     case 'lt':
-      jumpInstruction = 'D;JGT'
+      jumpInstruction = 'D;JLT'
       break;
     case 'gt':
-      jumpInstruction = 'D;JLT'
+      jumpInstruction = 'D;JGT'
       break;
     case 'eq':
       jumpInstruction = 'D;JEQ'
@@ -169,7 +213,7 @@ AM=M-1
 D=M
 @SP
 AM=M-1
-D=D-M
+D=M-D
 @SP
 A=M
 M=-1
@@ -182,13 +226,6 @@ M=0
 @SP
 M=M+1
 `;
-}
-
-function getUniqueAddressSymbol () {
-  if( typeof getUniqueAddressSymbol.counter == 'undefined' ) {
-    getUniqueAddressSymbol.counter = 0;
-  }
-  return 'arithmetic.' + getUniqueAddressSymbol.counter++;
 }
 
 module.exports = {

@@ -47,9 +47,14 @@ if (process.argv.length < 3) {
     // create, or clear content in the output file.
     fs.writeFileSync(output, '');
 
+    // read from our input, split it into lines, and iterate over those lines.
     fs.readFileSync(input).toString().split('\n').forEach(function (line, lineNumber) {
+      /* if the line is a comment (identified by starting with the string '//')
+       * then we'll ignore it.
+       */
       if(line.startsWith("//")) {
         return;
+      // otherwise, we'll translate the line, and write to our output file
       } else {
         fs.appendFileSync(output, translateLine(line, lineNumber + 1));
       }
