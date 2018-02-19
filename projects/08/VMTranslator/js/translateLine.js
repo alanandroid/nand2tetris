@@ -16,7 +16,7 @@ const { translateADD,
   translateOR,
   translateNOT } = require('./arithmeticFunctions');
 
-  function translateLine(line, lineNumber) {
+  function translateLine(line, lineNumber, fileName) {
     line = line.toString();
     line = removeExtraWhiteSpaceFrom(line);
     // if the string is empty, return an empty line
@@ -29,11 +29,11 @@ const { translateADD,
     switch(words[0].toUpperCase()) {
 
       case 'POP':
-      translatedLine = translatePOP(words);
+      translatedLine = translatePOP(words, fileName);
       break;
 
       case 'PUSH':
-      translatedLine = translatePUSH(words);
+      translatedLine = translatePUSH(words, fileName);
       break;
 
       case 'ADD':
@@ -72,7 +72,7 @@ const { translateADD,
       translatedLine = translateNOT(words);
       break;
       default:
-      throw new CompilationError(line, lineNumber);
+      throw new CompilationError(fileName, line, lineNumber);
     }
 
     const completeStatement =

@@ -3,9 +3,9 @@
 *
 */
 const { CompilationError } = require('./errors');
-const { generateGeneralPUSH, generateConstantPUSH, generatePointerPUSH, generateStaticPUSH } = require('./pushFunctions');
+const { generateGeneralPOP, generateStaticPOP, generatePointerPOP } = require('./popFunctions');
 
-function translatePUSH(words) {
+function translatePOP(words, fileName) {
   const memorySegment = words[1];
   const memoryAddress = parseInt(words[2]);
 
@@ -16,16 +16,13 @@ function translatePUSH(words) {
     case 'THIS':
     case 'THAT':
     case 'TEMP':
-      return generateGeneralPUSH(memorySegment, memoryAddress);
-
-    case 'CONSTANT':
-      return generateConstantPUSH(memoryAddress);
+      return generateGeneralPOP(memorySegment, memoryAddress);
 
     case 'STATIC':
-      return generateStaticPUSH(memoryAddress);
+      return generateStaticPOP(memoryAddress, fileName);
 
     case 'POINTER':
-      return generatePointerPUSH(memoryAddress);
+      return generatePointerPOP(memoryAddress);
 
     default:
       return '';
@@ -33,8 +30,9 @@ function translatePUSH(words) {
 }
 
 module.exports = {
-  translatePUSH
-};
+  translatePOP
+}
+
 
 /**
 
@@ -43,29 +41,31 @@ Static handling:
 store each static in foo.i, where foo is the name of file
 i.e. push static 10 in translate.js -> add translate.10 onto the stack
 
-push static 5
+pop static 5
 ->
-*SP = *translate.5
-SP++
+SP--
+D=*SP
+@translate.5
+M=D
 
 
 Temp handling:
 
-insert TEMP = 5, same as LOCAL
-no TMP symbol
+TEMP = 5, same as LOCAL
 
 
 Pointer handling:
 
-push pointer 0
+pop pointer 0
 ->
 accesses THIS
 
-push pointer 1
+pop pointer 1
 ->
 accesses THAT
 
-*SP = THIS/THAT
-SP++
+SP--
+THIS/THAT = *SP
+
 
 */

@@ -1,7 +1,7 @@
 class CompilationError extends Error {
-	constructor(line, lineNumber) {
+	constructor(fileName, line, lineNumber) {
 		const errorMessage = '\x1b[31m' + 'COMPILATION ERROR' + '\x1b[0m' + '\n' +
-		'Error at line number ' + lineNumber + '.\n'
+		'Error at line number ' + lineNumber + ' of file ' + fileName +  '.vm\n' +
 		'Unable to parse "' + line + '"';
 
 		console.log(errorMessage);
@@ -26,12 +26,11 @@ class CommandLineError extends Error {
 	}
 }
 
-
 class FileReadError extends Error {
 	constructor() {
 		// \x1b[31m causes the text following it to be red, \x1b[0m resets to default
 		const errorMessage = '\x1b[31m' + 'COMMAND LINE ERROR' + '\x1b[0m' + '\n' +
-		'The input file provided does not exist.';
+		'The input provided does not match a file or directory.';
 
 		console.log(errorMessage);
 		process.exit(1);

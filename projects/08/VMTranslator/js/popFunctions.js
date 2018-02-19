@@ -93,15 +93,16 @@ M=D
 `;
 }
 
-function generateStaticPOP(memoryAddress) {
+function generateStaticPOP(memoryAddress, fileName) {
+  // if a file name was passed in, use it, otherwise, get something to work with
+  fileName = fileName || getFileName();
+
   /*
   * SP--
   * D=*SP
   * @memoryAddress.5
   * M=D
   */
-  const fileName = getFileName();
-
   return `
 @SP
 M=M-1

@@ -98,8 +98,9 @@ M=M+1
 `;
 }
 
-function generateStaticPUSH(memoryAddress) {
-  const fileName = getFileName();
+function generateStaticPUSH(memoryAddress, fileName) {
+  // if a file name was passed in, use it, otherwise, get something to work with
+  fileName = fileName || getFileName();
   /*
    * *SP = translate.5
    * SP++
