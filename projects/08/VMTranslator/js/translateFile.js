@@ -24,6 +24,7 @@ function translateFile(input, output) {
     fs.writeFileSync(output, '');
   }
 
+  // extract the filename from the input (for function and variable naming)
   const fileName = path.basename(input, '.vm');
 
   fs.readFileSync(input).toString().split('\n').forEach(function (line, lineNumber) {
